@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science Study Tutorial</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f4f7fb;color:#172033}
+header{background:linear-gradient(135deg,#123c69,#1976d2);color:white;padding:28px 16px;text-align:center}
+header h1{margin:0 0 8px;font-size:28px}
+header p{margin:0;font-size:14px}
+.container{max-width:1000px;margin:auto;padding:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}
+button,.tab{border:0;border-radius:10px;padding:12px 16px;background:#1976d2;color:#fff;cursor:pointer;font-size:15px}
+button:hover,.tab:hover{opacity:.9}
+.tab.active{background:#0d2d50}
+.card{background:white;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 16px #0000000d}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.subject{border-left:5px solid #1976d2}
+.subject h3{margin:0 0 8px}
+.subject ul{padding-left:20px;line-height:1.9}
+input,select,textarea{width:100%;padding:12px;border:1px solid #ccd5e0;border-radius:9px;margin:7px 0 14px;font-size:15px}
+.hidden{display:none}
+.option{display:block;background:#f0f5fb;color:#172033;text-align:left;margin:8px 0;width:100%;border:1px solid #d5dfeb}
+.option.selected{background:#c8e2ff;border-color:#1976d2}
+.result{font-size:20px;font-weight:bold;color:#0b7a43}
+.progress{height:10px;background:#e2e8f0;border-radius:10px;overflow:hidden}
+.progress div{height:100%;background:#19a463;width:0}
+footer{text-align:center;color:#667085;padding:25px;font-size:13px}
+.small{font-size:13px;color:#667085}
+body.dark{background:#101827;color:#e8eef7}body.dark .card{background:#1c293b;color:#e8eef7}body.dark input,body.dark select{background:#26364b;color:white;border-color:#53657b}body.dark .option{background:#26364b;color:white;border-color:#53657b}body.dark .small{color:#b8c4d6}
+</style>
+</head>
+<body>
+<header>
+<div style="font-size:42px">🎓</div>
+<h1>Science Study Tutorial</h1>
+<p>Class 9 • Science Division • Study & MCQ Practice</p>
+</header>
+
+<div class="container">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:15px"><b>আপনার পড়াশোনার সঙ্গী 🚀</b><button onclick="toggleDark()">🌙 থিম পরিবর্তন</button></div><div class="tabs">
+<button class="tab active" onclick="showPage('home',this)">হোম</button>
+<button class="tab" onclick="showPage('subjects',this)">বিষয়সমূহ</button>
+<button class="tab" onclick="showPage('exam',this)">MCQ পরীক্ষা</button>
+<button class="tab" onclick="showPage('progress',this)">অগ্রগতি</button>
+</div>
+
+<section id="home" class="page">
+<div class="card">
+<h2>স্বাগতম! 👋</h2>
+<p>নিয়মিত পড়াশোনা করুন, অধ্যায় শেষ করুন এবং MCQ পরীক্ষার মাধ্যমে নিজের প্রস্তুতি যাচাই করুন।</p>
+<div class="progress"><div id="homeProgress"></div></div>
+<p class="small" id="homeProgressText">আপনার অগ্রগতি: 0%</p>
+</div>
+<div class="grid">
+<div class="card"><h3>📚 বিষয়ভিত্তিক পড়াশোনা</h3><p>বিজ্ঞান বিভাগের গ্রুপ ও সাধারণ বিষয়গুলোর তালিকা দেখুন।</p></div>
+<div class="card"><h3>📝 MCQ পরীক্ষা</h3><p>নমুনা প্রশ্নের মাধ্যমে নিজেকে যাচাই করুন।</p></div>
+<div class="card"><h3>📈 অগ্রগতি ট্র্যাকার</h3><p>কতগুলো অধ্যায় শেষ করেছেন তা চিহ্নিত করুন।</p></div>
+</div>
+</section>
+
+<section id="subjects" class="page hidden">
+<div class="card"><h2>📚 বিষয়সমূহ</h2><input id="search" placeholder="বিষয় বা অধ্যায় খুঁজুন..." oninput="filterSubjects()"></div>
+<div class="grid" id="subjectGrid"></div>
+</section>
+
+<section id="exam" class="page hidden">
+<div class="card">
+<h2>MCQ পরীক্ষা</h2>
+<label>বিষয় নির্বাচন করুন</label>
+<select id="examSubject" onchange="loadQuestions()">
+<option value="all">সব বিষয়</option>
+<option value="physics">পদার্থবিজ্ঞান</option>
+<option value="chemistry">রসায়ন</option>
+<option value="biology">জীববিজ্ঞান</option>
+<option value="higher">উচ্চতর গণিত</option>
+<option value="math">সাধারণ গণিত</option>
+</select>
+<div id="quiz"></div>
+<button onclick="submitQuiz()">পরীক্ষা জমা দিন</button>
+<div id="quizResult"></div>
+</div>
+</section>
+
+<section id="progress" class="page hidden">
+<div class="card">
+<h2>অগ্রগতি ট্র্যাকার</h2>
+<p class="small">অধ্যায় শেষ হলে টিক চিহ্ন দিন।</p>
+<div id="tracker"></div>
+</div>
+</section>
+</div>
+
+<footer>Science Study Tutorial © 2026 | তৈরি করা হয়েছে পড়াশোনার সহায়তার জন্য</footer>
+
+<script>
+const subjects=[
+{name:"পদার্থবিজ্ঞান",key:"physics",icon:"⚛️",chapters:["ভৌত রাশি ও পরিমাপ","গতি","বল","কাজ, ক্ষমতা ও শক্তি","পদার্থের অবস্থা ও চাপ","বস্তুর উপর তাপের প্রভাব","তরঙ্গ ও শব্দ","আলোর প্রতিফলন","আলোর প্রতিসরণ"]},
+{name:"রসায়ন",key:"chemistry",icon:"🧪",chapters:["পদার্থের গঠন","পরমাণুর গঠন","পদার্থের অবস্থা","পর্যায় সারণি","রাসায়নিক বন্ধন","মোল ও রাসায়নিক গণনা","রাসায়নিক বিক্রিয়া","অম্ল, ক্ষার ও লবণ","রসায়ন ও শক্তি"]},
+{name:"জীববিজ্ঞান",key:"biology",icon:"🌿",chapters:["কোষ ও এর গঠন","কোষ বিভাজন","কোষ রসায়ন","অণুজীব","শৈবাল ও ছত্রাক","উদ্ভিদ শারীরতত্ত্ব","জীবের পরিবেশ","রেচন","সমন্বয়","চলন ও অঙ্গচালনা","জীবের প্রজনন"]},
+{name:"উচ্চতর গণিত",key:"higher",icon:"📐",chapters:["বীজগাণিতিক রাশি","জ্যামিতি","ত্রিকোণমিতি","অসীম ধারা","দ্বিপদী বিস্তৃতি","সম্ভাবনা"]},
+{name:"সাধারণ গণিত",key:"math",icon:"➗",chapters:["বীজগাণিতিক অনুপাত","দুই চলক বিশিষ্ট সরল সহসমীকরণ","পরিমিতি","ত্রিকোণমিতিক অনুপাত","পরিসংখ্যান","ব্যবহারিক জ্যামিতি"]},
+{name:"বাংলা ও ইংরেজি",key:"language",icon:"📖",chapters:["বাংলা ১ম পত্র","বাংলা ২য় পত্র","ইংরেজি ১ম পত্র","ইংরেজি ২য় পত্র"]},
+{name:"বাংলাদেশ ও বিশ্বপরিচয়",key:"bgs",icon:"🌍",chapters:["বাংলাদেশের স্বাধীনতা","নাগরিক অধিকার","অর্থনীতি ও সমাজ","বিশ্ব ও আন্তর্জাতিক সম্পর্ক"]},
+{name:"ICT ও ধর্ম",key:"other",icon:"💻",chapters:["তথ্য ও যোগাযোগ প্রযুক্তি","হিন্দুধর্ম ও নৈতিক শিক্ষা"]}
+];
+
+const questions=[
+{subject:"physics",q:"তাপমাত্রা বৃদ্ধির ফলে সাধারণত বস্তুর কী ঘটে?",o:["সংকোচন","প্রসারণ","ভর কমে যায়","রং পরিবর্তন"],a:1},
+{subject:"physics",q:"তাপ সঞ্চালনের কোন পদ্ধতিতে মাধ্যমের প্রয়োজন হয় না?",o:["পরিবহন","পরিচলন","বিকিরণ","সবগুলো"],a:2},
+{subject:"chemistry",q:"অম্লের pH সাধারণত কত?",o:["৭-এর কম","৭","৭-এর বেশি","১৪"],a:0},
+{subject:"biology",q:"মানবদেহে রেচনের প্রধান অঙ্গ কোনটি?",o:["হৃদপিণ্ড","ফুসফুস","বৃক্ক","পাকস্থলী"],a:2},
+{subject:"higher",q:"সম্ভাবনার মান কত থেকে কতের মধ্যে থাকে?",o:["০ থেকে ১","১ থেকে ১০","-১ থেকে ১","২ থেকে ৫"],a:0},
+{subject:"math",q:"ত্রিভুজের তিন কোণের সমষ্টি কত?",o:["৯০°","১৮০°","২৭০°","৩৬০°"],a:1}
+];
+
+let currentQuestions=[], answers={};
+function showPage(id,btn){
+document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+if(btn)btn.classList.add('active');
+if(id==='progress')renderTracker();
+}
+function toggleDark(){document.body.classList.toggle('dark');localStorage.setItem('dark',document.body.classList.contains('dark'));}
+if(localStorage.getItem('dark')==='true')document.body.classList.add('dark');
+function filterSubjects(){let term=document.getElementById('search').value.toLowerCase();document.querySelectorAll('#subjectGrid .subject').forEach(c=>c.style.display=c.innerText.toLowerCase().includes(term)?'block':'none');}
+function renderSubjects(){
+const grid=document.getElementById('subjectGrid');
+grid.innerHTML=subjects.map(s=>`<div class="card subject"><h3>${s.icon} ${s.name}</h3><ul>${s.chapters.map(c=>`<li>${c}</li>`).join('')}</ul></div>`).join('');
+}
+function renderTracker(){
+const box=document.getElementById('tracker');
+let total=0,done=0;
+box.innerHTML=subjects.map(s=>`<div class="card"><h3>${s.icon} ${s.name}</h3>${s.chapters.map((c,i)=>{
+let id=s.key+'_'+i;let checked=localStorage.getItem(id)==='1';total++;if(checked)done++;
+return `<label><input type="checkbox" ${checked?'checked':''} onchange="toggleChapter('${id}',this.checked)"> ${c}</label>`;
+}).join('')}</div>`).join('');
+let pct=Math.round(done/total*100);
+document.getElementById('homeProgress').style.width=pct+'%';
+document.getElementById('homeProgressText').textContent='আপনার অগ্রগতি: '+pct+'%';
+}
+function toggleChapter(id,val){localStorage.setItem(id,val?'1':'0');renderTracker();}
+function loadQuestions(){
+let sub=document.getElementById('examSubject').value;
+currentQuestions=sub==='all'?questions:questions.filter(q=>q.subject===sub);
+answers={};
+document.getElementById('quizResult').innerHTML='';
+document.getElementById('quiz').innerHTML=currentQuestions.map((q,i)=>`<div class="card"><b>${i+1}. ${q.q}</b>${q.o.map((o,j)=>`<button class="option" onclick="choose(${i},${j},this)">${String.fromCharCode(2453+j)}) ${o}</button>`).join('')}</div>`).join('');
+}
+function choose(i,j,el){answers[i]=j;el.parentElement.querySelectorAll('.option').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');}
+function submitQuiz(){
+let score=currentQuestions.reduce((n,q,i)=>n+(answers[i]===q.a?1:0),0);
+document.getElementById('quizResult').innerHTML=`<p class="result">আপনার ফলাফল: ${score} / ${currentQuestions.length}</p><p>সঠিক উত্তর: ${score}টি | ভুল/অনুত্তরিত: ${currentQuestions.length-score}টি</p>`;
+}
+renderSubjects();renderTracker();loadQuestions();
+</script>
+</body>
+</html>
